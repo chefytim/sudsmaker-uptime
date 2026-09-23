@@ -95,7 +95,7 @@ function keepalive() {
     console.log(`Opened issue #${created.number}.`);
   } else if (!reason && issue) {
     const mins = Math.round((Date.now() - new Date(issue.created_at).getTime()) / 60000);
-    const dur  = mins >= 120 ? `${(mins / 60).toFixed(1)} hours` : `${mins} minutes`;
+    const dur  = mins >= 120 ? `${(mins / 60).toFixed(1)} hours` : `${mins} minute${mins === 1 ? "" : "s"}`;
     await gh('POST', `/issues/${issue.number}/comments`, {
       body: `🟢 @${OWNER} ${SITE} is back up as of ${now}. Down for about ${dur} (as seen from GitHub).`,
     });
