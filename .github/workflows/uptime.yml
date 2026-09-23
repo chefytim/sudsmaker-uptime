@@ -6,9 +6,10 @@ on:
   workflow_dispatch:
     inputs:
       simulate_down:
-        description: 'Treat the site as down (tests the alert issue)'
-        type: boolean
-        default: false
+        description: 'Treat a target as down (tests the alert issue)'
+        type: choice
+        options: [none, site, brewhouse]
+        default: none
 
 permissions:
   issues: write
@@ -21,7 +22,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
