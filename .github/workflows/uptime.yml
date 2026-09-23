@@ -1,0 +1,27 @@
+name: uptime
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'   # GitHub runs these best-effort; expect some delay under load
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: write   # keepalive commit
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node check.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
