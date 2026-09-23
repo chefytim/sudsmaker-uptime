@@ -22,7 +22,7 @@ async function get(url) {
 }
 
 // Returns null when healthy, or a short reason string when not.
-async function checkOnce() {
+let checkOnce = async function checkOnce() {
   try {
     const home = await get(`${SITE}/`);
     const html = await home.text();
@@ -39,7 +39,7 @@ async function checkOnce() {
   } catch (err) {
     return `request failed: ${err.cause?.code || err.name}: ${err.cause?.message || err.message}`;
   }
-}
+};
 
 async function gh(method, path, body) {
   const res = await fetch(`https://api.github.com/repos/${REPO}${path}`, {
@@ -66,6 +66,10 @@ function keepalive() {
 }
 
 (async () => {
+  if (process.env.SIMULATE_DOWN === 'true') {
+    console.log('SIMULATE_DOWN set: treating the site as down.');
+    checkOnce = async () => 'simulated outage (manual test run)';
+  }
   let reason = await checkOnce();
   if (reason) {
     console.log(`First check failed (${reason}); retrying in ${RETRY_MS / 1000}s.`);

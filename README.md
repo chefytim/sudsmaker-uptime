@@ -25,3 +25,5 @@ the checker itself broke.
 - GitHub pauses scheduled workflows in public repos after 60 days without commits, so the
   script pushes an empty "keepalive" commit when the last commit is more than 45 days old.
 - Run it by hand: Actions → uptime → Run workflow, or `gh workflow run uptime`.
+- Test the alert: run it with **simulate_down** ticked (`gh workflow run uptime -f simulate_down=true`)
+  to open a test issue, then run it normally to close it again.
