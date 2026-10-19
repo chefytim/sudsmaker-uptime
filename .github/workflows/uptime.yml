@@ -1,4 +1,6 @@
 name: uptime
+# Brewery Watch outside watcher. Source of truth: chefytim/brewery-watch external/.
+# DMs Tim on Discord (secret DISCORD_BOT_TOKEN = the alert-only "Brewery Alerts" bot).
 
 on:
   schedule:
@@ -6,14 +8,13 @@ on:
   workflow_dispatch:
     inputs:
       simulate_down:
-        description: 'Treat a target as down (tests the alert issue)'
+        description: 'Treat a target as down (sends a test DM; state is not saved)'
         type: choice
-        options: [none, site, brewhouse]
+        options: [none, site, games, watch]
         default: none
 
 permissions:
-  issues: write
-  contents: write   # keepalive commit
+  contents: write   # keepalive commit only
 
 concurrency:
   group: uptime
@@ -28,7 +29,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # What's currently down is carried between runs in the Actions cache (newest entry wins).
+      - uses: actions/cache/restore@v4
+        with:
+          path: state.json
+          key: uptime-state-${{ github.run_id }}
+          restore-keys: uptime-state-
       - run: node check.js
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           SIMULATE_DOWN: ${{ inputs.simulate_down }}
+      - uses: actions/cache/save@v4
+        if: always() && hashFiles('state.json') != ''
+        with:
+          path: state.json
+          key: uptime-state-${{ github.run_id }}
